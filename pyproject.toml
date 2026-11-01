@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gr-brain"
+version = "0.1.0"
+description = "Train robot policies on your own GPU from Genuine Robotics Brain recordings, upload them for server verification, and run big models live against the Brain simulator."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.10"
+authors = [{ name = "Genuine Robotics", email = "support@genuinerobotics.com" }]
+keywords = ["robotics", "lerobot", "imitation-learning", "onnx", "mujoco", "behaviour-cloning"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=1.24",
+  "httpx>=0.25",
+  "websockets>=12",
+  "onnxruntime>=1.17",
+]
+
+[project.optional-dependencies]
+# Training + ONNX export (pick the torch build for your GPU from pytorch.org first).
+train = ["torch>=2.2", "onnx>=1.15", "onnxscript>=0.1"]
+# Live runtime on an NVIDIA GPU (replaces the CPU onnxruntime).
+gpu = ["onnxruntime-gpu>=1.17"]
+dev = ["pytest>=7", "torch>=2.2", "onnx>=1.15", "onnxscript>=0.1"]
+
+[project.scripts]
+gr-brain = "gr_brain.cli:main"
+
+[project.urls]
+Homepage = "https://platform.genuinerobotics.com"
+Documentation = "https://github.com/genuinerobotics/brain-runtime#readme"
+Issues = "https://github.com/genuinerobotics/brain-runtime/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gr_brain"]
+
+[tool.hatch.build.targets.sdist]
+include = ["gr_brain", "tests", "docs", "examples", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,379 @@
+{
+  "format": "gr-brain-platform/1",
+  "adapter": {
+    "version": 1,
+    "hz": [
+      5,
+      10,
+      25,
+      50
+    ],
+    "control_dt": 0.02,
+    "max_chunk": 50,
+    "safety_max_deg_per_sec": [
+      1,
+      720
+    ]
+  },
+  "model_run_seconds": 10,
+  "model_criteria": [
+    {
+      "measure": "hard_violations",
+      "op": "==",
+      "value": 0,
+      "why": "A brain must never break a hard limit of the robot."
+    },
+    {
+      "measure": "worst_torque_pct",
+      "op": "<",
+      "value": 100,
+      "why": "No actuator may be asked for more torque than it has."
+    }
+  ],
+  "task_criterion": {
+    "measure": "task.success",
+    "op": "==",
+    "value": 1,
+    "why": "The task is judged from where things end up."
+  },
+  "verify": {
+    "max_seeds": 10,
+    "max_sim_seconds": 120
+  },
+  "robots": {
+    "digital-twin-arm": {
+      "joints": [
+        {
+          "name": "shoulder_pan",
+          "lerobot": "shoulder_pan",
+          "kind": "revolute"
+        },
+        {
+          "name": "shoulder_lift",
+          "lerobot": "shoulder_lift",
+          "kind": "revolute"
+        },
+        {
+          "name": "elbow_flex",
+          "lerobot": "elbow_flex",
+          "kind": "revolute"
+        },
+        {
+          "name": "wrist_flex",
+          "lerobot": "wrist_flex",
+          "kind": "revolute"
+        },
+        {
+          "name": "wrist_roll",
+          "lerobot": "wrist_roll",
+          "kind": "revolute"
+        },
+        {
+          "name": "gripper",
+          "lerobot": "gripper",
+          "kind": "gripper"
+        }
+      ],
+      "base": false,
+      "tasks": []
+    },
+    "hello-robot-stretch-4": {
+      "joints": [
+        {
+          "name": "left_wheel_joint",
+          "lerobot": "left_wheel",
+          "kind": "wheel"
+        },
+        {
+          "name": "back_wheel_joint",
+          "lerobot": "back_wheel",
+          "kind": "wheel"
+        },
+        {
+          "name": "right_wheel_joint",
+          "lerobot": "right_wheel",
+          "kind": "wheel"
+        },
+        {
+          "name": "lift_joint",
+          "lerobot": "lift",
+          "kind": "prismatic"
+        },
+        {
+          "name": "extend",
+          "lerobot": "arm",
+          "kind": "prismatic"
+        },
+        {
+          "name": "wrist_yaw_joint",
+          "lerobot": "wrist_yaw",
+          "kind": "revolute"
+        },
+        {
+          "name": "wrist_pitch_joint",
+          "lerobot": "wrist_pitch",
+          "kind": "revolute"
+        },
+        {
+          "name": "wrist_roll_joint",
+          "lerobot": "wrist_roll",
+          "kind": "revolute"
+        },
+        {
+          "name": "gripper_finger_left_joint",
+          "lerobot": "gripper_left",
+          "kind": "gripper"
+        },
+        {
+          "name": "gripper_finger_right_joint",
+          "lerobot": "gripper_right",
+          "kind": "gripper"
+        }
+      ],
+      "base": true,
+      "tasks": []
+    },
+    "koch-v1-1": {
+      "joints": [
+        {
+          "name": "base_rotation",
+          "lerobot": "shoulder_pan",
+          "kind": "revolute"
+        },
+        {
+          "name": "pitch",
+          "lerobot": "shoulder_lift",
+          "kind": "revolute"
+        },
+        {
+          "name": "elbow",
+          "lerobot": "elbow_flex",
+          "kind": "revolute"
+        },
+        {
+          "name": "wrist_pitch",
+          "lerobot": "wrist_flex",
+          "kind": "revolute"
+        },
+        {
+          "name": "wrist_roll",
+          "lerobot": "wrist_roll",
+          "kind": "revolute"
+        },
+        {
+          "name": "gripper",
+          "lerobot": "gripper",
+          "kind": "gripper"
+        }
+      ],
+      "base": false,
+      "tasks": [
+        {
+          "id": "koch-peg-in-bin",
+          "robot": "koch-v1-1",
+          "label": "Red peg in the bin",
+          "success": {
+            "prop": "peg_red",
+            "center": [
+              -0.06,
+              0.19
+            ],
+            "halfSize": [
+              0.035,
+              0.035
+            ],
+            "maxZ": 0.06
+          },
+          "randomize": {
+            "prop": "peg_red",
+            "xy": 0.01
+          }
+        }
+      ]
+    },
+    "lekiwi": {
+      "joints": [
+        {
+          "name": "arm_shoulder_pan",
+          "lerobot": "shoulder_pan",
+          "kind": "revolute"
+        },
+        {
+          "name": "arm_shoulder_lift",
+          "lerobot": "shoulder_lift",
+          "kind": "revolute"
+        },
+        {
+          "name": "arm_elbow_flex",
+          "lerobot": "elbow_flex",
+          "kind": "revolute"
+        },
+        {
+          "name": "arm_wrist_flex",
+          "lerobot": "wrist_flex",
+          "kind": "revolute"
+        },
+        {
+          "name": "arm_wrist_roll",
+          "lerobot": "wrist_roll",
+          "kind": "revolute"
+        },
+        {
+          "name": "arm_gripper",
+          "lerobot": "gripper",
+          "kind": "gripper",
+          "reversed": true
+        },
+        {
+          "name": "base_left_wheel",
+          "lerobot": "base_left_wheel",
+          "kind": "wheel"
+        },
+        {
+          "name": "base_right_wheel",
+          "lerobot": "base_right_wheel",
+          "kind": "wheel"
+        },
+        {
+          "name": "base_back_wheel",
+          "lerobot": "base_back_wheel",
+          "kind": "wheel"
+        }
+      ],
+      "base": true,
+      "tasks": []
+    },
+    "lerobot-humanoid": {
+      "joints": [
+        {
+          "name": "hipz_left",
+          "lerobot": "left_hip_yaw",
+          "kind": "revolute"
+        },
+        {
+          "name": "hipx_left",
+          "lerobot": "left_hip_roll",
+          "kind": "revolute"
+        },
+        {
+          "name": "hipy_left",
+          "lerobot": "left_hip_pitch",
+          "kind": "revolute"
+        },
+        {
+          "name": "knee_left",
+          "lerobot": "left_knee",
+          "kind": "revolute"
+        },
+        {
+          "name": "ankley_left",
+          "lerobot": "left_ankle_pitch",
+          "kind": "revolute"
+        },
+        {
+          "name": "anklex_left",
+          "lerobot": "left_ankle_roll",
+          "kind": "revolute"
+        },
+        {
+          "name": "hipz_right",
+          "lerobot": "right_hip_yaw",
+          "kind": "revolute"
+        },
+        {
+          "name": "hipx_right",
+          "lerobot": "right_hip_roll",
+          "kind": "revolute"
+        },
+        {
+          "name": "hipy_right",
+          "lerobot": "right_hip_pitch",
+          "kind": "revolute"
+        },
+        {
+          "name": "knee_right",
+          "lerobot": "right_knee",
+          "kind": "revolute"
+        },
+        {
+          "name": "ankley_right",
+          "lerobot": "right_ankle_pitch",
+          "kind": "revolute"
+        },
+        {
+          "name": "anklex_right",
+          "lerobot": "right_ankle_roll",
+          "kind": "revolute"
+        }
+      ],
+      "base": false,
+      "tasks": []
+    },
+    "odri-solo-12": {
+      "joints": [
+        {
+          "name": "FL_HAA",
+          "lerobot": "FL_HAA",
+          "kind": "revolute"
+        },
+        {
+          "name": "FL_HFE",
+          "lerobot": "FL_HFE",
+          "kind": "revolute"
+        },
+        {
+          "name": "FL_KFE",
+          "lerobot": "FL_KFE",
+          "kind": "revolute"
+        },
+        {
+          "name": "FR_HAA",
+          "lerobot": "FR_HAA",
+          "kind": "revolute"
+        },
+        {
+          "name": "FR_HFE",
+          "lerobot": "FR_HFE",
+          "kind": "revolute"
+        },
+        {
+          "name": "FR_KFE",
+          "lerobot": "FR_KFE",
+          "kind": "revolute"
+        },
+        {
+          "name": "HL_HAA",
+          "lerobot": "HL_HAA",
+          "kind": "revolute"
+        },
+        {
+          "name": "HL_HFE",
+          "lerobot": "HL_HFE",
+          "kind": "revolute"
+        },
+        {
+          "name": "HL_KFE",
+          "lerobot": "HL_KFE",
+          "kind": "revolute"
+        },
+        {
+          "name": "HR_HAA",
+          "lerobot": "HR_HAA",
+          "kind": "revolute"
+        },
+        {
+          "name": "HR_HFE",
+          "lerobot": "HR_HFE",
+          "kind": "revolute"
+        },
+        {
+          "name": "HR_KFE",
+          "lerobot": "HR_KFE",
+          "kind": "revolute"
+        }
+      ],
+      "base": false,
+      "tasks": []
+    }
+  }
+}

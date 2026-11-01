@@ -1,0 +1,126 @@
+# gr-brain
+
+Train robot policies on **your own GPU** from the demonstrations you record in
+[Genuine Robotics Brain](https://platform.genuinerobotics.com), upload them for
+**server verification**, and run models too big for the browser **live** against
+the Brain simulator.
+
+```
+record demos in Brain ──► gr-brain pull ──► gr-brain train ──► gr-brain export ──► gr-brain upload --verify
+                                                                                         │
+                                         "model verified: 3/3 PASS" ◄── our servers ◄────┘
+
+gr-brain serve my_policy.py  ◄──── relay ────►  Brain page (simulator)   ← live, on your GPU
+```
+
+Apache-2.0. Python 3.10+. Windows, macOS, Linux.
+
+## Install
+
+```bash
+pip install gr-brain                 # CLI, client, live runtime (CPU inference)
+pip install "gr-brain[train]"        # + PyTorch training and ONNX export
+pip install "gr-brain[gpu]"          # + onnxruntime-gpu for `serve` on NVIDIA
+```
+
+For a CUDA build of PyTorch, install it first from <https://pytorch.org>, then `gr-brain[train]`.
+
+## Sign in
+
+On the platform, open any project → **Brain** → **Train on your own GPU** → *Create token*.
+Copy the token (it is shown once), then:
+
+```bash
+gr-brain login --token grb_…
+gr-brain doctor          # checks Python, onnxruntime, torch/GPU and your token
+```
+
+The token works on Brain only, never as a platform login. Revoke it on the same page any time.
+`GR_BRAIN_TOKEN` / `GR_BRAIN_API` override the saved values (CI).
+
+## Train → upload → verify
+
+```bash
+gr-brain projects                                   # your projects and their robots
+gr-brain datasets <project-id>                      # what you recorded (Brain → Control → Record)
+gr-brain pull <project-id> <dataset>                # → <robot>_<dataset>.json
+gr-brain train koch-v1-1_my-demos.json --name pick  # behaviour cloning → runs/pick/
+gr-brain export runs/pick                           # → runs/pick/model.onnx (checked)
+gr-brain upload runs/pick --project <project-id> --verify --task koch-peg-in-bin
+```
+
+* **train** — a small MLP learns *observation → next commanded action(s)*; inputs are
+  normalised with your data's statistics, outputs come out in LeRobot units. Uses CUDA,
+  Apple MPS or CPU. Options: `--chunk N` (predict N actions per inference), `--hz`,
+  `--hidden`, `--layers`, `--epochs`, `--max-speed`.
+* **export** — one self-contained `model.onnx` (input `observation` [1, inputs], output
+  `action` [1, chunk × joints]); onnxruntime's output is compared with PyTorch's before
+  it is accepted. Limit: 16 MB.
+* **upload --verify** — the model appears in Brain → *Your models*; our servers re-run it
+  on the same physics as the browser (from the copy *we* store) and report
+  `model verified: x/y PASS`, with which criteria failed and why. Verification costs
+  credits per simulated second (shown before it runs).
+
+## Live runtime — your GPU drives the simulator
+
+```bash
+gr-brain serve runs/pick                       # a training run (exported or not)
+gr-brain serve model.onnx --robot koch-v1-1    # any ONNX model + adapter.json next to it
+gr-brain serve my_policy.py                    # your own code — anything that maps obs → action
+```
+
+Then in Brain, your runtime appears under the robot's brains as **online**: *Run* and
+*Evaluate* use it exactly like a built-in brain. The simulation waits for your model at
+every control step (lockstep), so a slow model or link makes a run slower, never
+different. Both ends connect **out** to the platform's relay — nothing to open on your
+firewall, and the GPU machine doesn't have to be the one with the browser.
+
+Your own policy:
+
+```python
+# my_policy.py
+import numpy as np
+
+class MyPolicy:
+    robot = "koch-v1-1"
+    name = "my-act-policy"
+    adapter = {...}            # see docs/adapter.md — which joints in, which out, at what rate
+
+    def reset(self, seed: int) -> None: ...
+    def act(self, observation: np.ndarray) -> np.ndarray: ...
+
+def make_policy(device=None):
+    return MyPolicy()
+```
+
+A full example: [`examples/custom_policy.py`](examples/custom_policy.py).
+
+Runs on your machine are *self-reported* — to get a verified result, export the model to
+ONNX and `upload --verify`.
+
+## Safety
+
+Brain's safety layer applies to every brain, yours included: each target is clamped to the
+joint's range and rate-limited (`safety.maxDegPerSec`), and a non-finite output stops the
+run before anything moves. The runtime only ever receives numbers and returns numbers; it
+never executes anything sent to it.
+
+## Docs
+
+* [docs/quickstart.md](docs/quickstart.md) — the whole flow, step by step
+* [docs/adapter.md](docs/adapter.md) — how tensors map onto joints
+* [docs/protocol.md](docs/protocol.md) — the live runtime protocol
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
+`gr_brain/data/platform.json` (robots, joints, criteria, tasks) is generated by the
+platform; please don't edit it by hand — open an issue if something there looks wrong.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
